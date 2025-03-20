@@ -1,4 +1,4 @@
-
+// pages/index.tsx
 import React, { useState, useEffect } from 'react';
 import SearchBar from '../components/SearchBar';
 import FilterPanel from '../components/FilterPanel';
@@ -13,6 +13,7 @@ const Index = () => {
     updateFilters,
     results,
     loading,
+    error,
     sortConfig,
     requestSort,
     pagination,
@@ -28,7 +29,6 @@ const Index = () => {
     const timer = setTimeout(() => {
       setShowIntro(false);
     }, 5000);
-
     return () => clearTimeout(timer);
   }, []);
 
@@ -69,6 +69,18 @@ const Index = () => {
         setQuery={setQuery} 
         loading={loading} 
       />
+      
+      {error && (
+        <div className="w-full max-w-4xl mx-auto mb-6">
+          <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-xl shadow-sm flex items-start">
+            <span className="flex-shrink-0 mr-2">⚠️</span>
+            <div>
+              <h3 className="font-medium">Error connecting to the database</h3>
+              <p className="text-sm">{error}</p>
+            </div>
+          </div>
+        </div>
+      )}
       
       <FilterPanel 
         filters={filters} 

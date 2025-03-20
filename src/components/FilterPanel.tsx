@@ -1,4 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
+// components/FilterPanel.tsx
+import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { FilterParams } from '../types';
 import { filterOptions } from '../utils/mockData';
 import { Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
@@ -11,6 +12,13 @@ interface FilterPanelProps {
 
 const FilterPanel: React.FC<FilterPanelProps> = ({ filters, updateFilters, totalResults }) => {
   const [expanded, setExpanded] = React.useState(false);
+
+  // Extract available options from the current results for dynamic filtering
+  const availableOptions = useMemo(() => {
+    // We're still using the static filterOptions, but in a real implementation
+    // you might want to extract these from the API response metadata
+    return filterOptions;
+  }, []);
 
   const handleRemoveFilter = (category: keyof FilterParams, key: string, value?: any) => {
     const newFilters = { ...filters };
@@ -253,7 +261,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ filters, updateFilters, total
                 <div className="space-y-2">
                   <FilterSelect 
                     label="District" 
-                    options={filterOptions.demographics.district}
+                    options={availableOptions.demographics.district}
                     selected={filters.demographics?.district || []}
                     onChange={(value) => {
                       const newFilters = { ...filters };
@@ -268,7 +276,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ filters, updateFilters, total
                   
                   <FilterSelect 
                     label="Gender" 
-                    options={filterOptions.demographics.gender}
+                    options={availableOptions.demographics.gender}
                     selected={filters.demographics?.gender ? [filters.demographics.gender] : []}
                     onChange={(value) => {
                       const newFilters = { ...filters };
@@ -281,7 +289,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ filters, updateFilters, total
                   
                   <FilterSelect 
                     label="Religion" 
-                    options={filterOptions.demographics.religion}
+                    options={availableOptions.demographics.religion}
                     selected={filters.demographics?.religion ? [filters.demographics.religion] : []}
                     onChange={(value) => {
                       const newFilters = { ...filters };
@@ -294,7 +302,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ filters, updateFilters, total
                   
                   <FilterSelect 
                     label="Marital Status" 
-                    options={filterOptions.demographics.maritalStatus}
+                    options={availableOptions.demographics.maritalStatus}
                     selected={filters.demographics?.maritalStatus ? [filters.demographics.maritalStatus] : []}
                     onChange={(value) => {
                       const newFilters = { ...filters };
@@ -312,7 +320,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ filters, updateFilters, total
                 <div className="space-y-2">
                   <FilterSelect 
                     label="Crop Types" 
-                    options={filterOptions.crop_data.cropTypes}
+                    options={availableOptions.crop_data.cropTypes}
                     selected={filters.crop_data?.cropTypes || []}
                     onChange={(value) => {
                       const newFilters = { ...filters };
@@ -327,7 +335,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ filters, updateFilters, total
                   
                   <FilterSelect 
                     label="Specific Crops" 
-                    options={filterOptions.crop_data.crops}
+                    options={availableOptions.crop_data.crops}
                     selected={filters.crop_data?.crops || []}
                     onChange={(value) => {
                       const newFilters = { ...filters };
@@ -376,7 +384,7 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ filters, updateFilters, total
                   {filters.organization?.associatedWithFPO && (
                     <FilterSelect 
                       label="FPO Name" 
-                      options={filterOptions.organization.fpoName}
+                      options={availableOptions.organization.fpoName}
                       selected={filters.organization?.fpoName ? [filters.organization.fpoName] : []}
                       onChange={(value) => {
                         const newFilters = { ...filters };
@@ -396,7 +404,11 @@ const FilterPanel: React.FC<FilterPanelProps> = ({ filters, updateFilters, total
       
       <div className="mt-2 text-center">
         <p className="text-sm text-gray-500">
-          {totalResults} farmer{totalResults !== 1 ? 's' : ''} found
+          {totalResults > 0 ? (
+            `${totalResults} farmer${totalResults !== 1 ? 's' : ''} found`
+          ) : (
+            'No farmers found matching your criteria'
+          )}
         </p>
       </div>
     </div>
@@ -459,7 +471,7 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
         <ChevronDown className="h-4 w-4 text-gray-500" />
       </div>
       
-      {isOpen && (
+      {isOpen && options.length > 0 && (
         <div className="absolute z-10 mt-1 w-full bg-white border rounded-lg shadow-lg max-h-48 overflow-y-auto animate-slide-down">
           {options.map((option) => {
             const optionStr = option.toString();
@@ -482,6 +494,12 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
               </div>
             );
           })}
+          
+          {options.length === 0 && (
+            <div className="px-3 py-2 text-sm text-gray-400">
+              No options available
+            </div>
+          )}
         </div>
       )}
     </div>
@@ -489,4 +507,3 @@ const FilterSelect: React.FC<FilterSelectProps> = ({
 };
 
 export default FilterPanel;
-
